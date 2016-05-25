@@ -35,7 +35,7 @@ public class UserController : Singleton<UserController>
     /// The Transform to be the parent of the texts.
     /// </summary>
     [SerializeField]
-    private Transform textParent;
+    private RectTransform textParent;
 
     /// <summary>
     /// The list of Text fields holding the usernames.
@@ -81,7 +81,7 @@ public class UserController : Singleton<UserController>
 
         this.userName = Random.Range(100000000, 999999999).ToString();
         this.userNameText.text = this.userName;
-        
+
         this.changeReceiver = new ChatReceiver();
         this.changeReceiver.ReceiveEvent += this.UpdateReceived;
         this.changeReceiver.StartExchangeListen("userchange");
@@ -100,37 +100,39 @@ public class UserController : Singleton<UserController>
     /// </summary>
     public void Update()
     {
-        lock(namesToAdd)
+        lock (this.namesToAdd)
         {
-            for (int i = 0; i < namesToAdd.Count; i++)
+            for (int i = 0; i < this.namesToAdd.Count; i++)
             {
                 // If we're gonna delete it anyway, why go through the effort of creating the object?
-                if (!namesToRemove.Contains(namesToAdd[i]))
+                if (this.userName != this.namesToAdd[i] && !this.namesToRemove.Contains(this.namesToAdd[i]) && !this.userNameHolders.ContainsKey(this.namesToAdd[i]))
                 {
-                    Text text = Instantiate(playerNamesText);
-                    text.text = namesToAdd[i];
-
-                    text.transform.SetParent(textParent);
-
-                    userNameHolders.Add(namesToAdd[i], text);
+                    Text text = Instantiate(this.playerNamesText);
+                    text.text = this.namesToAdd[i];
+                    text.transform.SetParent(this.textParent);
+                    this.userNameHolders.Add(this.namesToAdd[i], text);
                 }
             }
 
-            namesToAdd.Clear();
+            this.namesToAdd.Clear();
+
+            this.textParent.sizeDelta = new Vector2(this.textParent.sizeDelta.x, 20 * (this.userNameHolders.Count + 1));
         }
 
-        lock (namesToRemove)
+        lock (this.namesToRemove)
         {
-            for (int i = 0; i < namesToRemove.Count; i++)
+            for (int i = 0; i < this.namesToRemove.Count; i++)
             {
-                if (userNameHolders.ContainsKey(namesToRemove[i]))
+                if (this.userNameHolders.ContainsKey(this.namesToRemove[i]))
                 {
-                    userNameHolders.Remove(namesToRemove[i]);
-                    Destroy(userNameHolders[namesToRemove[i]]);
+                    this.userNameHolders.Remove(this.namesToRemove[i]);
+                    UserController.Destroy(this.userNameHolders[this.namesToRemove[i]]);
                 }
             }
 
-            namesToRemove.Clear();
+            this.namesToRemove.Clear();
+
+            this.textParent.sizeDelta = new Vector2(this.textParent.sizeDelta.x, 20 * (this.userNameHolders.Count + 1));
         }
     }
 
@@ -168,7 +170,7 @@ public class UserController : Singleton<UserController>
         {
             foreach (string s in usernames.Keys)
             {
-                this.namesToAdd.Add(UserName);
+                this.namesToAdd.Add(s);
             }
         }
     }
@@ -184,11 +186,11 @@ public class UserController : Singleton<UserController>
 
         if (joinInfo.Added)
         {
-            this.AddUser(e.Message);
+            this.AddUser(joinInfo.Username);
         }
         else
         {
-            this.RemoveUser(e.Message);
+            this.RemoveUser(joinInfo.Username);
         }
     }
 

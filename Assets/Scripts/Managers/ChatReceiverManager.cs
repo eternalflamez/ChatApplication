@@ -6,6 +6,7 @@
 using System;
 using Newtonsoft.Json;
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Main class for managing ChatReceivers, making sure the user receives all sorts of messages.
@@ -17,6 +18,11 @@ public class ChatReceiverManager : Singleton<ChatReceiverManager>
     /// The controller that sends messages to the UI.
     /// </summary>
     private MessageController messageController;
+
+    /// <summary>
+    /// The list of chat receivers.
+    /// </summary>
+    private List<ChatReceiver> chatReceivers = new List<ChatReceiver>();
 
     /// <summary>
     /// Gets the current time and formats it for chat.
@@ -39,6 +45,8 @@ public class ChatReceiverManager : Singleton<ChatReceiverManager>
 
         // Listen to new whispers to this person.
         receiver.StartExchangeListen("team-" + teamName);
+
+        chatReceivers.Add(receiver);
     }
 
     /// <summary>
@@ -61,6 +69,8 @@ public class ChatReceiverManager : Singleton<ChatReceiverManager>
 
         // Listen to new whispers to this person.
         receiver.StartBasicListen("whisper-" + UserController.Instance.UserName);
+
+        chatReceivers.Add(receiver);
     }
     
     /// <summary>
@@ -70,6 +80,8 @@ public class ChatReceiverManager : Singleton<ChatReceiverManager>
     {
         ChatReceiver receiver = this.CreateReceiver();
         receiver.StartExchangeListen("all");
+
+        chatReceivers.Add(receiver);
     }
 
     /// <summary>
@@ -130,5 +142,13 @@ public class ChatReceiverManager : Singleton<ChatReceiverManager>
         ChatReceiver cr = new ChatReceiver();
         cr.ReceiveEvent += this.MessageReceived;
         return cr;
+    }
+
+    private void OnApplicationQuit()
+    {
+        foreach (ChatReceiver receiver in chatReceivers)
+        {
+            receiver.Disconnect();
+        }
     }
 }
