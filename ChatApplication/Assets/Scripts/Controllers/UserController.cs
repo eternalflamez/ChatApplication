@@ -104,7 +104,7 @@ public class UserController : Singleton<UserController>
         {
             for (int i = 0; i < this.namesToAdd.Count; i++)
             {
-                // If we're gonna delete it anyway, why go through the effort of creating the object?
+                // If we're gonna delete it anyway, why go through the effort of creating the object? (Don't add if it's in the to-remove list as well)
                 if (this.userName != this.namesToAdd[i] && !this.namesToRemove.Contains(this.namesToAdd[i]) && !this.userNameHolders.ContainsKey(this.namesToAdd[i]))
                 {
                     Text text = Instantiate(this.playerNamesText);
@@ -204,5 +204,7 @@ public class UserController : Singleton<UserController>
         Dictionary<string, byte> users = JsonConvert.DeserializeObject<Dictionary<string, byte>>(e.Message);
 
         this.OverwriteUsers(users);
+
+        this.userListReceiver.CloseConnection();
     }
 }

@@ -95,8 +95,8 @@ namespace GameChatHost
             switch (e.Channel)
             {
                 case "userlogin":
-                    this.AddUser(e.Message);
                     this.sender.StartExchangeSend("newuserlist", this.userNames);
+                    this.AddUser(e.Message);
 
                     Console.WriteLine(e.Message + " joined.");
                     break;

@@ -85,6 +85,14 @@ public abstract class Receiver
         this.channel.Close();
         this.connection.Close();
     }
+
+    /// <summary>
+    /// Disconnects the user from the connection.
+    /// </summary>
+    public void CloseConnection()
+    {
+        this.connection.Close();
+    }
     
     /// <summary>
     /// Sets up the channel to be consumed.

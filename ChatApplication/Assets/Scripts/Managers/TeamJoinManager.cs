@@ -127,6 +127,9 @@ public class TeamJoinManager : Singleton<TeamJoinManager>
 
             this.teamJoinReceiver.Disconnect();
             this.teamJoinSender.Disconnect();
+            
+            this.teamName = "";
+            this.userNames = new List<string>();
 
             this.dirtyUI = true;
         }
@@ -138,7 +141,6 @@ public class TeamJoinManager : Singleton<TeamJoinManager>
     /// <param name="name">The name of the team to join.</param>
     private void JoinTeam(string name)
     {
-        // TODO: show all available teams
         if (name == this.TeamName)
         {
             return;

@@ -37,6 +37,7 @@ public class ChatSenderManager : MonoBehaviour
     public void Send()
     {
         string message = this.textfield.text;
+        this.textfield.text = "";
         string[] split = message.Split(' ');
         string potentionalCommand = split[0];
         string text = this.ConnectStringsFromArray(split, 1);
